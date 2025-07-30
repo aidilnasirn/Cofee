@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Data Penjualan - Ot Coffee Kendari</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Input Data Penjualan</h1>
+            <nav>
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('predict') }}">Prediksi Permintaan Produk</a>
+                <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
+            </nav>
+        </header>
+        <main>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul class="flashes">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+            <div class="form-container">
+                <h3>Tambah Data Penjualan Baru</h3>
+                <form method="POST">
+                    <div class="form-group">
+                        <label for="product">Nama Produk:</label>
+                        <input type="text" id="product" name="product" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="date">Tanggal:</label>
+                        <input type="date" id="date" name="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantity_sold">Jumlah Terjual:</label>
+                        <input type="number" id="quantity_sold" name="quantity_sold" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="weather">Cuaca (cth: Cerah, Hujan, Berawan):</label>
+                        <input type="text" id="weather" name="weather" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="event">Ada Event (1=Ya, 0=Tidak):</label>
+                        <input type="number" id="event" name="event" min="0" max="1" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Tambah Data</button>
+                </form>
+            </div>
+
+            <div class="data-table">
+                <h3>Data Penjualan Tersimpan</h3>
+                {% if sales_data %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Produk</th>
+                            <th>Tanggal</th>
+                            <th>Jumlah Terjual</th>
+                            <th>Cuaca</th> {# Changed from Suhu #}
+                            <th>Event</th> {# Changed from Promo #}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in sales_data %}
+                        <tr>
+                            <td>{{ item.product }}</td>
+                            <td>{{ item.date }}</td>
+                            <td>{{ item.quantity_sold }}</td>
+                            <td>{{ item.weather }}</td> {# Changed from item.temperature #}
+                            <td>{{ item.event }}</td> {# Changed from item.promo #}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>Belum ada data penjualan. Silakan tambahkan data di atas.</p>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+</body>
+</html>

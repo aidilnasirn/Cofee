@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <h2>Selamat Datang, {{ username }}!</h2>
+        <p>Sistem Prediksi permintaan produk menggunakan framework flask dan algoritma k-nearest neigbors untuk penentuan jumlah pemesanan di cafe ot coffee kendari</p>
+        <div class="dashboard-links">
+            <a href="{{ url_for('predict') }}" class="btn">Mulai Prediksi</a>
+        </div>
+    </div>
+{% endblock %}

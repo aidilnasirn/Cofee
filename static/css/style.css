@@ -1,0 +1,337 @@
+/* General Body Styles */
+* body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f6;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    /* background-image: url('/static/img/background.jpg'); */
+    background-image: url('https://img.freepik.com/vetores-premium/fundo-branco-com-elemento-azul_907220-1416.jpg?semt=ais_hybrid&w=740');
+    background-size: cover;
+    background-position: center;
+}
+
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px 0;
+}
+
+/* Header */
+header {
+    background-color: #0037de6f; /* A shade of blue for fresh coffee vibe */
+    color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.img-ot img{
+    width: 80px;
+    height: 70px;
+    color: white;
+}
+
+header nav {
+    display: inline-block;
+    vertical-align: middle;
+    float: right;
+}
+
+header nav ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    margin-top: -60px;
+}
+
+header nav ul li {
+    display: inline-block;
+    margin-left: 20px;
+ 
+}
+
+header nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+
+}
+
+header nav ul li a:hover {
+    color: #c8e6c9; /* Lighter green on hover */
+}
+
+/* Main Content Area */
+main {
+    flex-grow: 1;
+    padding: 20px 0;
+}
+
+/* Card Styling for Forms and Results */
+.card {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+.card h2, .card h3 {
+    color: #0cc0df; 
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* Form Group Styling */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
+.form-group input[type="text"],
+.form-group input[type="password"],
+.form-group input[type="number"],
+.form-group select {
+    width: calc(100% - 20px);
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+    box-sizing: border-box; /* Include padding in width */
+}
+
+.form-group input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+.form-group small {
+    color: #777;
+    font-size: 0.85em;
+    margin-top: 5px;
+    display: block;
+}
+
+/* Dalam .form-group input[type="text"], dll. */
+.form-group input[type="text"],
+.form-group input[type="password"],
+.form-group input[type="number"],
+.form-group select { /* Tambahkan ini */
+    width: calc(100% - 20px);
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+
+.product-input-group {
+    border: 1px dashed #afbede;
+    padding: 15px;
+    margin-bottom: 25px;
+    border-radius: 6px;
+    background-color: #f0fdf0;
+}
+
+.product-input-group h4 {
+    color: #0cc0df;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    background-color: #4679a2;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn:hover {
+    background-color: #2196F3;
+    transform: translateY(-2px);
+}
+
+.btn-primary {
+    background-color: #2196F3; /* Blue for primary actions */
+}
+.btn-primary:hover {
+    background-color: #1976D2;
+}
+
+.btn-success {
+    background-color: #2196F3; /* Green for success/submit */
+}
+.btn-success:hover {
+    background-color: #2196F3;
+}
+
+.btn-secondary {
+    background-color: #9E9E9E; /* Grey for secondary actions */
+    margin-left: 10px;
+}
+.btn-secondary:hover {
+    background-color: #757575;
+}
+
+.btn-print {
+    background-color: #673AB7; /* Purple for print */
+    margin-right: 10px;
+}
+.btn-print:hover {
+    background-color: #512DA8;
+}
+
+.action-buttons {
+    margin-top: 30px;
+    text-align: center;
+}
+
+/* Table Styling */
+.results-table {
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+.results-table table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.results-table th,
+.results-table td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.results-table th {
+    background-color: #e8f5e9; /* Light green header */
+    font-weight: bold;
+    color: #388e3c;
+}
+
+.results-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.results-table tr:hover {
+    background-color: #e0f2f1; /* Lighter blue-green on hover */
+}
+
+.text-danger {
+    color: #d32f2f; /* Red for negative values/shortages */
+    font-weight: bold;
+}
+
+.text-warning {
+    color: #fbc02d; /* Orange for recommendations */
+    font-weight: bold;
+}
+
+/* Dashboard Links */
+.dashboard-links {
+    margin-top: 25px;
+    text-align: center;
+}
+
+.dashboard-links .btn {
+    padding: 15px 30px;
+    font-size: 1.1em;
+    background: #0cc0df;
+    
+}
+
+/* Flash Messages */
+.flash-messages {
+    margin-bottom: 20px;
+}
+
+.alert {
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: white;
+}
+
+.alert-success {
+    background-color: #4CAF50;
+}
+
+.alert-danger {
+    background-color: #f44336;
+}
+
+.alert-info {
+    background-color: #2196F3;
+}
+
+/* Footer */
+footer {
+    background-color: #0037de6f;
+    color: white;
+    text-align: center;
+    font-size: 0.9em;
+    margin-top: auto; /* Push footer to the bottom */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+
+    header h1 {
+        font-size: 1.5em;
+    }
+
+    header nav {
+        float: none;
+        text-align: center;
+        display: contents;
+        
+    }
+
+    header nav ul li {
+        /* margin: 0 10px; */
+        font-size: 12px;
+        margin-top: 20px;  
+    }
+
+    .card {
+        padding: 20px;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="password"],
+    .form-group input[type="number"],
+    .form-group select {
+        width: calc(100% - 20px); /* Adjust for smaller screens */
+    }
+
+    .results-table th,
+    .results-table td {
+        padding: 8px 10px;
+        font-size: 0.9em;
+    }
+
+    
+}

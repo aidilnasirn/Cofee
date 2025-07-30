@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Hasil Prediksi{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <h2>Hasil Prediksi Permintaan Produk</h2>
+        {% if results %}
+            <div class="result-summary">
+                <p>Berikut adalah hasil prediksi permintaan dan rekomendasi untuk produk Anda:</p>
+            </div>
+            <div class="results-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Produk</th>
+                            <th>Permintaan Diprediksi</th>
+                            <th>Stok Saat Ini</th>
+                            <th>Pemesanan Aktual Hari Ini</th>
+                            <th>Kekurangan (Prediksi vs Stok)</th>
+                            <th>Rekomendasi Pemesanan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in results %}
+                        <tr>
+                            <td>{{ item.product_name }}</td>
+                            <td>{{ item.predicted_demand }} unit</td>
+                            <td>{{ item.current_stock }} unit</td>
+                            <td>{{ item.actual_order }} unit</td>
+                            <td class="{% if item.kekurangan_prediksi > 0 %}text-danger{% endif %}">{{ item.kekurangan_prediksi }} unit</td>
+                            <td class="{% if item.rekomendasi_pemesanan > 0 %}text-warning{% endif %}">{{ item.rekomendasi_pemesanan }} unit</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="action-buttons">
+                <button onclick="window.print()" class="btn btn-print">Cetak Hasil</button>
+                <a href="{{ url_for('predict') }}" class="btn btn-secondary">Prediksi Baru</a>
+            </div>
+        {% else %}
+            <p>Tidak ada hasil prediksi yang tersedia. Silakan lakukan prediksi terlebih dahulu.</p>
+            <a href="{{ url_for('predict') }}" class="btn btn-primary">Mulai Prediksi</a>
+        {% endif %}
+    </div>
+{% endblock %}

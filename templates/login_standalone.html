@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OT Coffee - Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* CSS khusus untuk halaman login agar di tengah */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f7f6; /* Pastikan background tetap ada */
+            margin: 0;
+            padding: 0;
+        }
+        .card {
+            width: 90%;
+            max-width: 500px; /* Batasi lebar card login */
+            padding: 30px;
+            box-sizing: border-box; /* Pastikan padding dihitung dalam lebar */
+        }
+        .lg {
+            text-align: center;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2 class="lg">Login Sistem Ot Coffee Kendari</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <form method="POST">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" placeholder="Masukkan username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" placeholder="Masukkan password" required>
+            </div>
+            <button type="submit" class="btn">Login</button>
+        </form>
+    </div>
+</body>
+</html>

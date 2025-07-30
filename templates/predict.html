@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Prediksi Permintaan Produk{% endblock %}
+
+{% block content %}
+
+    <div class="card">
+        <h2>Form Prediksi Permintaan Produk</h2>
+        <form method="POST">
+            <h3>Kondisi Prediksi (untuk input model KNN)</h3>
+            <div class="form-group">
+                <label for="hari_ke">Hari Ke- (1-365):</label>
+                <input type="number" id="hari_ke" name="hari_ke" min="1" max="365" required>
+                <small>Angka hari dalam setahun (e.g., hari ke-150)</small>
+            </div>
+            <div class="form-group">
+                <label for="cuaca">Cuaca:</label>
+                <select id="cuaca" name="cuaca" required>
+                    {% for option in weather_options %}
+                        <option value="{{ option }}">{{ option|capitalize }}</option>
+                    {% endfor %}
+                </select>
+                <small>Kondisi cuaca perkiraan untuk hari prediksi</small>
+            </div>
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="event_khusus" name="event_khusus">
+                <label for="event_khusus">Ada Event Khusus?</label>
+            </div>
+
+            <h3>Data Stok dan Pemesanan Aktual (Hari Ini)</h3>
+            {% for key, name in products.items() %}
+                <div class="product-input-group">
+                    <h4>{{ name }}</h4>
+                    <div class="form-group">
+                        <label for="stok_{{ key }}">Stok Saat Ini ({{ name }}):</label>
+                        <input type="number" id="stok_{{ key }}" name="stok_{{ key }}" min="0" value="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pemesanan_harian_{{ key }}">Total Pemesanan Hari Ini ({{ name }}):</label>
+                        <input type="number" id="pemesanan_harian_{{ key }}" name="pemesanan_harian_{{ key }}" min="0" value="0" required>
+                    </div>
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn">Proses Prediksi</button>
+        </form>
+    </div>
+{% endblock %}
