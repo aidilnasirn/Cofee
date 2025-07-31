@@ -1,0 +1,70 @@
+/* Mengatur gambar latar belakang untuk seluruh aplikasi */
+[data-testid="stAppViewContainer"] {
+    background-image: url("data:image/jpg;base64,{img_base64}");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+/* Membuat semua elemen utama transparan agar background terlihat */
+[data-testid="stHeader"], [data-testid="stToolbar"], [data-testid="stSidebar"] > div:first-child {
+    background: rgba(0,0,0,0);
+}
+
+/* Kontainer untuk halaman login */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90vh; /* Mengisi hampir seluruh tinggi layar */
+}
+
+/* Kartu form login */
+.login-form {
+    /* background-color: rgba(26, 26, 46, 0.85); */
+    padding: 3rem;
+    border-radius: 15px;
+    /* box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); */
+    backdrop-filter: blur(8.5px);
+    -webkit-backdrop-filter: blur(8.5px);
+    /* border: 1px solid rgba(255, 255, 255, 0.18); */
+    width: 100%;
+    max-width: 450px;
+}
+
+/* Gaya untuk input field di dalam form */
+.login-form .stTextInput input, .login-form .stTextInput label {
+    color: #FFFFFF !important;
+    /* background-color: rgba(255, 255, 255, 0.1); */
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Gaya untuk tombol login */
+.login-form .stButton button {
+    background-color: #e94560;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    width: 100%;
+    padding: 10px 0;
+}
+
+/* Kontainer untuk konten utama aplikasi */
+.main-content {
+    background-color: rgba(26, 26, 46, 0.85); /* Warna semi-transparan */
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    backdrop-filter: blur(8.5px);
+    -webkit-backdrop-filter: blur(8.5px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Judul Aplikasi */
+h1 {
+    color: #e94560;
+    text-align: center;
+}
