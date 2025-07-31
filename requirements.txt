@@ -1,5 +1,6 @@
 Flask
 pandas
+KNeighborsRegressor
 scikit-learn
 numpy
 os
