@@ -1,6 +1,4 @@
-Flask
+flask
 pandas
-KNeighborsRegressor
 scikit-learn
 numpy
-os
