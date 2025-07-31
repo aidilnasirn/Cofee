@@ -91,8 +91,8 @@ def show_login_page():
     local_css("style.css") # Terapkan CSS juga di halaman login
     st.title("Login Sistem Prediksi OT Coffee")
     with st.form("login_form"):
-        username = st.text_input("Username", value="admin")
-        password = st.text_input("Password", type="password", value="admin")
+        username = st.text_input("Username", value="Masukkan username")
+        password = st.text_input("Password", type="password", value="Masukkan password")
         submitted = st.form_submit_button("Login")
         if submitted:
             if username == "admin" and password == "admin":
