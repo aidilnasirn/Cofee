@@ -1,16 +1,17 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+import streamlit as st
 import pandas as pd
 from sklearn.neighbors import KNeighborsRegressor
 import numpy as np
-import os
 
-app = Flask(__name__)
-app.secret_key = 'your_super_secret_key' # Ganti dengan kunci rahasia yang kuat
+# Konfigurasi halaman Streamlit
+st.set_page_config(page_title="Prediksi Stok Kopi", layout="wide")
 
-# Fungsi dummy untuk mendapatkan data training (ganti dengan koneksi DB sungguhan)
+# --- DATA & MODEL TRAINING ---
+@st.cache_data
 def load_training_data():
-    # Ini harusnya mengambil data historis dari database Anda
-    # Tambahkan kolom 'cuaca' dengan nilai kategorikal (cerah, hujan, mendung)
+    """
+    Memuat dan melakukan pra-pemrosesan data training.
+    """
     data = {
         'hari_ke': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
         'cuaca': ['cerah', 'cerah', 'hujan', 'cerah', 'mendung', 'cerah', 'hujan', 'cerah', 'mendung', 'cerah', 'cerah', 'hujan', 'cerah', 'mendung', 'cerah'],
@@ -32,195 +33,144 @@ def load_training_data():
         'jumlah_hot_coppucino': [80, 57, 75, 88, 42, 37, 80, 43, 86, 49, 81, 98, 32, 74, 97],
         'jumlah_ice_dark_chocolate': [80, 55, 48, 75, 86, 48, 38, 77, 100, 55, 75, 88, 65, 67, 32],
         'jumlah_nutty_oat_latte': [85, 67, 42, 37, 79, 85, 45, 35, 37, 74, 81, 99, 28, 74, 26],
-        'jumlah_hot_classic_milo': [70, 57, 85, 88, 92, 47, 80, 93, 46, 99, 31, 68, 72, 54, 37],
-        'jumlah_ice_dark_chocolate': [80, 55, 48, 75, 86, 48, 38, 77, 100, 55, 75, 88, 65, 67, 32]
+        'jumlah_hot_classic_milo': [70, 57, 85, 88, 92, 47, 80, 93, 46, 99, 31, 68, 72, 54, 37]
     }
     df = pd.DataFrame(data)
-    # Lakukan One-Hot Encoding untuk kolom 'cuaca'
     df = pd.get_dummies(df, columns=['cuaca'], prefix='cuaca')
     return df
 
-# Model KNN (akan dilatih ulang setiap kali aplikasi dimulai atau data training berubah)
-knn_models = {}
-# Perbarui feature_cols untuk menyertakan kolom hasil One-Hot Encoding
-feature_cols = ['hari_ke', 'event_khusus', 'cuaca_cerah', 'cuaca_hujan', 'cuaca_mendung']
-product_cols = ['jumlah_kopi_susu', 'jumlah_caramel_praline_macchiato', 'jumlah_ice_americano', 'jumlah_kopi_hitam', 'jumlah_latte', 'jumlah_jus_alpukat', 'jumlah_croissant', 'jumlah_hot_tea', 'jumlah_lemon_tea', 'jumlah_iced_classic_milo', 'jumlah_hot_americano', 'jumlah_expresso', 'jumlah_macha_latte', 'jumlah_ice_buttercream_tiramisu_latte', 'jumlah_hot_coppucino', 'jumlah_ice_dark_chocolate', 'jumlah_nutty_oat_latte', 'jumlah_hot_classic_milo' ] # Tambahkan semua produk Anda
-
+@st.cache_resource
 def train_knn_models():
+    """
+    Melatih model KNN untuk setiap produk berdasarkan data training.
+    """
     df_train = load_training_data()
-    if df_train.empty:
-        print("Warning: Training data is empty. KNN models cannot be trained.")
-        return
-
-    # Pastikan semua kolom fitur yang diharapkan ada setelah One-Hot Encoding
-    # Ini penting jika suatu kategori cuaca tidak muncul di data training
+    feature_cols = ['hari_ke', 'event_khusus', 'cuaca_cerah', 'cuaca_hujan', 'cuaca_mendung']
+    product_cols = [col for col in df_train.columns if col.startswith('jumlah_')]
+    knn_models = {}
     for col in ['cuaca_cerah', 'cuaca_hujan', 'cuaca_mendung']:
         if col not in df_train.columns:
-            df_train[col] = 0 # Tambahkan kolom dengan nilai 0 jika tidak ada
-
+            df_train[col] = 0
     X_train = df_train[feature_cols]
     for product in product_cols:
         y_train = df_train[product]
-        # n_neighbors bisa disesuaikan, atau menggunakan cross-validation untuk optimasi
-        knn = KNeighborsRegressor(n_neighbors=5)
+        knn = KNeighborsRegressor(n_neighbors=3)
         knn.fit(X_train, y_train)
         knn_models[product] = knn
     print("KNN models trained successfully.")
+    return knn_models
 
-# Panggil fungsi training saat aplikasi dimulai
-train_knn_models()
+# --- FUNGSI CSS ---
+def local_css(file_name):
+    """Fungsi untuk membaca file CSS lokal dan menyisipkannya."""
+    with open(file_name) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
+# --- MAIN APP LOGIC ---
+knn_models = train_knn_models()
+df_train = load_training_data()
+products_map = {
+    'jumlah_kopi_susu': 'Kopi Susu', 'jumlah_caramel_praline_macchiato': 'Caramel Praline Macchiato',
+    'jumlah_ice_americano': 'Ice Americano', 'jumlah_kopi_hitam': 'Kopi Hitam', 'jumlah_latte': 'Latte',
+    'jumlah_jus_alpukat': 'Jus Alpukat', 'jumlah_croissant': 'Croissant', 'jumlah_hot_tea': 'Hot Tea',
+    'jumlah_lemon_tea': 'Lemon Tea', 'jumlah_iced_classic_milo': 'Ice Classic Milo',
+    'jumlah_hot_americano': 'Hot Americano', 'jumlah_expresso': 'Expresso', 'jumlah_macha_latte': 'Macha Latte',
+    'jumlah_ice_buttercream_tiramisu_latte': 'Ice Buttercream Tiramisu Latte', 'jumlah_hot_coppucino': 'Hot Cappucino',
+    'jumlah_ice_dark_chocolate': 'Ice Dark Chocolate', 'jumlah_nutty_oat_latte': 'Nutty Oat Latte',
+    'jumlah_hot_classic_milo': 'Hot Classic Milo'
+}
 
-# Dummy user for login
-USERS = {'admin': 'admin'}
+if 'logged_in' not in st.session_state:
+    st.session_state.logged_in = False
+if 'results_df' not in st.session_state:
+    st.session_state.results_df = None
 
-@app.route('/')
-def index():
-    if 'username' in session:
-        return redirect(url_for('dashboard'))
-    return redirect(url_for('login'))
+# --- UI COMPONENTS ---
+def show_login_page():
+    """Menampilkan halaman login."""
+    local_css("style.css") # Terapkan CSS juga di halaman login
+    st.title("Login Sistem Prediksi OT Coffee")
+    with st.form("login_form"):
+        username = st.text_input("Username", value="admin")
+        password = st.text_input("Password", type="password", value="admin")
+        submitted = st.form_submit_button("Login")
+        if submitted:
+            if username == "admin" and password == "admin":
+                st.session_state.logged_in = True
+                st.rerun()
+            else:
+                st.error("Username atau password salah!")
 
-# ... (kode sebelumnya) ...
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        if username in USERS and USERS[username] == password:
-            session['username'] = username
-            flash('Login successful!', 'success')
-            return redirect(url_for('dashboard'))
-        else:
-            flash('Invalid username or password', 'danger')
-    return render_template('login_standalone.html') # Ubah di sini
-
-# ... (kode selanjutnya) ...
-
-@app.route('/logout')
-def logout():
-    session.pop('username', None)
-    flash('You have been logged out.', 'info')
-    return redirect(url_for('login'))
-
-@app.route('/dashboard')
-def dashboard():
-    if 'username' not in session:
-        return redirect(url_for('login'))
-    return render_template('dashboard.html', username=session['username'])
-
-@app.route('/predict', methods=['GET', 'POST'])
-def predict():
-    if 'username' not in session:
-        return redirect(url_for('login'))
-
-    products = {
-        'kopi_susu': 'Kopi Susu',
-        'caramel_praline_macchiato': 'Caramel Praline Macchiato',
-        'ice_americano': 'Ice Americano',
-        'latte':'Latte',
-        'jus_alpukat': 'Jus Alpukat',
-        'croissant': 'Croissant',
-        'hot_tea': 'Hot Tea',
-        'lemon_tea': 'Lemon Tea',
-        'ice_classic_milo': 'Ice Classic Milo',
-        'hot_americano': 'Hot Americano',
-        'expresso': 'Expresso',
-        'macha_latte': 'Macha Latte',
-        'ice_buttercream_tiramisu_latte': 'Ice Buttercream Tiramisu Latte',
-        'hot_coppucino' : 'Hot Cappucino',
-        'ice_dark_chocolate': 'Ice Dark Chocolate',
-        'nutty_oat_latte': 'Nutty Oat Latte',
-        'hot_classic_milo': 'Hot Classic Milo'
-
-
-
-
-
-        # Tambahkan produk lain di sini sesuai dengan product_cols
-    }
+def show_main_app():
+    """Menampilkan aplikasi utama setelah login berhasil."""
+    # **PANGGIL FUNGSI CSS DI SINI**
+    local_css("style.css")
     
-    # Opsi cuaca untuk dropdown di HTML
-    weather_options = ['cerah', 'hujan', 'mendung']
+    with st.sidebar:
+        st.header(f"Selamat Datang, Admin!")
+        st.info("Aplikasi ini menggunakan KNN untuk memprediksi permintaan produk.")
+        if st.button("Logout"):
+            st.session_state.logged_in = False
+            st.session_state.results_df = None
+            st.rerun()
 
-    if request.method == 'POST':
-        try:
-            # Input untuk kondisi prediksi
-            hari_ke = int(request.form['hari_ke'])
-            cuaca_input = request.form['cuaca'] # Ambil nilai cuaca dari form
-            event_khusus = 1 if 'event_khusus' in request.form else 0
+    st.title("Dashboard Prediksi & Rekomendasi Stok")
+    st.markdown("---")
 
-            # Lakukan One-Hot Encoding untuk cuaca_input
-            cuaca_encoded = {'cuaca_cerah': 0, 'cuaca_hujan': 0, 'cuaca_mendung': 0}
-            if f'cuaca_{cuaca_input}' in cuaca_encoded:
-                cuaca_encoded[f'cuaca_{cuaca_input}'] = 1
+    with st.form("prediction_form"):
+        st.header("1. Kondisi Prediksi")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            hari_ke = st.number_input("Prediksi untuk Hari ke-", min_value=1, value=16)
+        with col2:
+            cuaca_input = st.selectbox("Kondisi Cuaca", options=['cerah', 'hujan', 'mendung'])
+        with col3:
+            event_khusus = st.checkbox("Ada Event Khusus?")
 
-            # Input untuk stok dan pemesanan aktual
-            current_stocks = {}
-            actual_orders = {}
-            for key in products:
-                current_stocks[key] = int(request.form.get(f'stok_{key}', 0))
-                actual_orders[key] = int(request.form.get(f'pemesanan_harian_{key}', 0))
+        st.markdown("---")
+        st.header("2. Input Stok & Pemesanan Aktual (Opsional)")
+        for p_col, p_name in products_map.items():
+            cols = st.columns([0.5, 0.25, 0.25])
+            with cols[0]:
+                st.write(p_name)
+            with cols[1]:
+                st.number_input("Stok Saat Ini", key=f"stok_{p_col}", min_value=0, value=0, label_visibility="collapsed")
+            with cols[2]:
+                st.number_input("Pemesanan Aktual", key=f"pemesanan_{p_col}", min_value=0, value=0, label_visibility="collapsed")
+        
+        submitted = st.form_submit_button("Buat Prediksi & Rekomendasi")
 
+    if submitted:
+        cuaca_encoded = {'cuaca_cerah': 0, 'cuaca_hujan': 0, 'cuaca_mendung': 0}
+        cuaca_encoded[f'cuaca_{cuaca_input}'] = 1
+        event_val = 1 if event_khusus else 0
 
-            # Buat input fitur untuk prediksi sesuai dengan feature_cols
-            input_features = np.array([[
-                hari_ke,
-                event_khusus,
-                cuaca_encoded['cuaca_cerah'],
-                cuaca_encoded['cuaca_hujan'],
-                cuaca_encoded['cuaca_mendung']
-            ]])
-            
-            predictions = {}
+        input_features = np.array([[
+            hari_ke, event_val, cuaca_encoded['cuaca_cerah'],
+            cuaca_encoded['cuaca_hujan'], cuaca_encoded['cuaca_mendung']
+        ]])
+        
+        results = []
+        for p_col, p_name in products_map.items():
+            pred = knn_models[p_col].predict(input_features)[0]
+            predicted_demand = max(0, round(pred))
+            current_stock = st.session_state[f'stok_{p_col}']
+            rekomendasi_pemesanan = max(0, int(predicted_demand * 1.1) - current_stock)
+            results.append({
+                'Nama Produk': p_name,
+                'Prediksi Permintaan': predicted_demand,
+                'Stok Saat Ini': current_stock,
+                'Rekomendasi Pemesanan': rekomendasi_pemesanan
+            })
+        st.session_state.results_df = pd.DataFrame(results)
 
-            # Lakukan prediksi untuk setiap produk
-            for product_key, product_name in products.items():
-                if f'jumlah_{product_key}' in knn_models:
-                    pred = knn_models[f'jumlah_{product_key}'].predict(input_features)[0]
-                    predictions[product_key] = max(0, round(pred)) # Pastikan tidak ada prediksi negatif
-                else:
-                    predictions[product_key] = 0 # Produk tidak ada modelnya
+    if st.session_state.results_df is not None:
+        st.markdown("---")
+        st.header("Hasil Prediksi")
+        st.dataframe(st.session_state.results_df.style.highlight_max(subset=['Prediksi Permintaan', 'Rekomendasi Pemesanan'], color='#e94560', axis=0))
 
-            # Hitung kekurangan dan rekomendasi pemesanan
-            results = []
-            for product_key, product_name in products.items():
-                predicted_demand = predictions.get(product_key, 0)
-                current_stock = current_stocks.get(product_key, 0)
-                actual_order = actual_orders.get(product_key, 0)
-
-                # Kekurangan berdasarkan stok saat ini dan permintaan yang diprediksi
-                kekurangan_prediksi = max(0, predicted_demand - current_stock)
-
-                # Rekomendasi pemesanan (bisa disesuaikan logikanya)
-                # Misalnya, kita ingin stok mencukupi setidaknya 110% dari prediksi permintaan
-                rekomendasi_pemesanan = max(0, int(predicted_demand * 1.1) - current_stock) # Contoh: target 110% dari prediksi
-
-                results.append({
-                    'product_name': product_name,
-                    'predicted_demand': predicted_demand,
-                    'current_stock': current_stock,
-                    'actual_order': actual_order,
-                    'kekurangan_prediksi': kekurangan_prediksi,
-                    'rekomendasi_pemesanan': rekomendasi_pemesanan
-                })
-
-            session['prediction_results'] = results
-            return redirect(url_for('result'))
-
-        except ValueError as e:
-            flash(f'Invalid input: {e}. Please ensure all numerical fields are filled correctly.', 'danger')
-        except Exception as e:
-            flash(f'An error occurred: {e}', 'danger')
-    return render_template('predict.html', products=products, weather_options=weather_options)
-
-@app.route('/result')
-def result():
-    if 'username' not in session:
-        return redirect(url_for('login'))
-    results = session.pop('prediction_results', []) # Ambil dan hapus dari session
-    return render_template('result.html', results=results)
-
-
-if __name__ == '__main__':
-    app.run(debug=True) # Set debug=False untuk produksi
+# --- KONTROL ALUR APLIKASI ---
+if st.session_state.logged_in:
+    show_main_app()
+else:
+    show_login_page()
